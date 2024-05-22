@@ -8,7 +8,8 @@ using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using models;
-using PortaCapena.OdooJsonRpcClient.Converters;
+using ConsoleApp3.ezyapi.Product.models;
+using ConsoleApp3.ezyapi.Product.mapper;
 
 namespace models
 {
@@ -18,7 +19,7 @@ namespace models
         public Partner? Partner { get; set; }
         public List<OrderLine>? OrderLines { get; set; }
         public List<Product>? Products { get; set; }
-        public Currency? Currency { get; set; }
+        //public Currency? Currency { get; set; }
     }
     public class SaleOrder
     {
@@ -31,12 +32,12 @@ namespace models
         public DateTime? DateOrder { get; set; }
         public DateTime? CommitmentDate { get; set; }
     }
-
+    /*
     public class Currency
     {
         public string? FullName { get; set; }
     }
-
+    */
 
     public class OrderLine
     {
@@ -68,7 +69,6 @@ namespace models
 public class Program
 {
 
-
     // Method GET SALE.ORDER
     public static async Task<List<SaleOrder>> GetRecordsSaleOrder(OdooRepository<SaleOrderOdooModel> model)
     {
@@ -84,11 +84,11 @@ public class Program
                         order.PartnerInvoiceId,
                         order.PartnerShippingId,
                         order.DateOrder,
-                        order.CommitmentDate,
+                        //order.CommitmentDate,
                         order.Id,
-                        order.CurrencyId 
+                        //order.CurrencyId 
                     })
-                    //.Take(1)  // uncomment to take all orders
+                    .Take(4)  // uncomment to take all orders
                     .ToListAsync();
 
             if (odooResult.Failed)
@@ -105,8 +105,8 @@ public class Program
                 PartnerInvoiceId = order.PartnerInvoiceId,
                 PartnerShippingId = order.PartnerShippingId,
                 DateOrder = order.DateOrder,
-                CommitmentDate = order.CommitmentDate,
-                CurrencyId = order.CurrencyId
+                //CommitmentDate = order.CommitmentDate,
+                //CurrencyId = order.CurrencyId
 
             }).ToList();
 
@@ -117,7 +117,6 @@ public class Program
         }
 
     }
-
 
     // Method GET PRODUCT.PRODUCT
     public static async Task<List<Product>> GetRecordsProductProduct(OdooRepository<ProductProductOdooModel> model, long? productId)
@@ -234,7 +233,7 @@ public class Program
         }
     }
   
-    public static async Task<List<Currency>> GetRecordsCurrency(OdooRepository<ResCurrencyOdooModel> model, long? CurrencyId)
+  /*  public static async Task<List<Currency>> GetRecordsCurrency(OdooRepository<ResCurrencyOdooModel> model, long? CurrencyId)
     {
         try
         {
@@ -262,6 +261,7 @@ public class Program
             throw new Exception("Failed Try <GetRecordsCurrency> \n" + err.Message.ToString());
         }
     }
+  */
 
     // Main
     public static async Task Main()
@@ -269,25 +269,51 @@ public class Program
 
         try
         {
-            string? password = Environment.GetEnvironmentVariable("PORTA_PASSWORD");
-
+            //string? password = Environment.GetEnvironmentVariable("PORTA_PASSWORD");
+            /*
             if (string.IsNullOrEmpty(password))
             {
                 Console.WriteLine("Password not found in environment variables.");
                 return;
             }
-
-
+            */
+          
             // CONNEXION
+            /*
             OdooConfig config = new OdooConfig(
                     apiUrl: "http://localhost:8069",
                     dbName: "test",
                     userName: "franck.rochette@ezytail.com",
                     password: password
                     );
+           */
+           
+            OdooConfig config = new OdooConfig(apiUrl: "http://10.102.9.101:8069/", dbName: "postgres", userName: "admin", password: "0doo_Master@dmin");
 
-            var odooClient = new OdooClient(config);
+            var odooClient = new OdooClient(config!);
             var loginResult = await odooClient.LoginAsync();
+
+            var productMsg = new Article()
+            {
+                ArticleReference = "test final",
+                LongArticleDescription = "test description",
+                ArticlePrice1 = 1,
+            };
+
+            var repository = new OdooRepository<ProductProductOdooModel>(config!);
+
+            var productsResult = await repository.Query().ToListAsync();
+
+            var model = ArticleMapper.ToDbModel(productMsg, null);
+            
+            /*
+            var model2 = OdooDictionaryModel.Create(() => new ProductProductOdooModel() 
+            { 
+                Name = "product"
+            }); 
+            */
+            
+            var result = await repository.CreateAsync(model);
 
             /*
             // get models
@@ -298,7 +324,6 @@ public class Program
             }
             */
 
-            
             var start = new Stopwatch();
             start.Start();
 
@@ -366,10 +391,10 @@ public class Program
 
                         var recordsOrderLine = await GetRecordsOrderLine(repositoryOrderLine, order.Id);
                         var products = new List<Product>();
-
+                        /*
                         var recordsCurrency = await GetRecordsCurrency(repositoryCurrency, order.CurrencyId);
                         var currency = recordsCurrency.FirstOrDefault();
-
+                           */
                         foreach (var line in recordsOrderLine)
                         {
                             var recordsProductProduct = await GetRecordsProductProduct(repositoryProductProduct, line.ProductId);
@@ -382,10 +407,12 @@ public class Program
                             Partner = partner,
                             OrderLines = recordsOrderLine,
                             Products = products,
-                            Currency = currency
+                            //Currency = currency
                         });
-                    }
 
+                    }
+                
+                
                     var jsonString = JsonSerializer.Serialize(aggregatedOrders, new JsonSerializerOptions
                     {
                         WriteIndented = true,
@@ -393,7 +420,7 @@ public class Program
                     });                       
                     Console.WriteLine(jsonString);
                     Console.WriteLine("Nombre de commande: " + nbOrder);
-
+                
                 }
                 else Console.WriteLine("No Orders found !"); 
 
