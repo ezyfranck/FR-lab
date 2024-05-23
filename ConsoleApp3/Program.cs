@@ -8,6 +8,8 @@ using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using models;
 using PortaCapena.OdooJsonRpcClient.Converters;
+using ConsoleApp3.ezyapi.Partner.models;
+using ConsoleApp3.ezyapi.Partner.mapper;
 
 
 namespace models
@@ -267,13 +269,10 @@ public class Program
     {
         try
         {   
+            
             // CONNEXION
-
  /*
-            string? password = Environment.GetEnvironmentVariable("PORTA_PASSWORD");
-          
-            
-            
+            string? password = Environment.GetEnvironmentVariable("PORTA_PASSWORD"); 
             OdooConfig config = new OdooConfig(
                     apiUrl: "http://localhost:8069",
                     dbName: "test",
@@ -290,8 +289,7 @@ public class Program
             // product
             var repository = new OdooRepository<ProductProductOdooModel>(config!);
 
-  /*
-             
+  /*       
             // Méthode 1 product
             var productMsg = new Article()
             {
@@ -304,7 +302,6 @@ public class Program
             var result = await repository.CreateAsync(modelProduct);
 
             //var productsResult = await repository.Query().ToListAsync();
-
  */
 
  
@@ -319,21 +316,19 @@ public class Program
             var result = await repository.CreateAsync(productMsg);
  
 
-
             // partner
             
             var repoPartner = new OdooRepository<ResPartnerOdooModel>(config!);
             
- /*
              
             // Méthode 1 partner
             var partnerMsg = new Customer()
             {
-                RecipientName = "Méthodo 1 client final",
-                RecipientAddress1 = "adress1 test",
+                RecipientName = "Méthodo 1 client final 2",
+                RecipientAddress1 = "adress1 test2",
                 RecipientAddress2 = null,
                 RecipientPostalCode = "12332",
-                RecipientCity = "testcity",
+                RecipientCity = "testcity2",
                 RecipientPhone = "0000000000",
                 RecipientPhone2 = "1111111111",
             };
@@ -343,9 +338,8 @@ public class Program
 
             //partnerResult = await repoPartner.Query().ToListAsync();
 
- */
-
  
+
             // Méthode 2 partner
             var partnerMsg2 = OdooDictionaryModel.Create(() => new ResPartnerOdooModel()
             {
@@ -359,20 +353,24 @@ public class Program
             });
 
             var result2 = await repository.CreateAsync(partnerMsg2);
- 
+
+
 
             // purchase
+            var repoPurchase = new OdooRepository<PurchaseOrderOdooModel>(config!);
 
-            // Méthode 1 purchase
-            var purchaseOrder = OdooDictionaryModel.Create( ()=> new PurchaseOrderOdooModel()
+            // Méthode 2 purchase
+            var purchaseMsg = OdooDictionaryModel.Create(() => new PurchaseOrderOdooModel()
             {
                 Name = "Ptest",
-                ProductId = "" ,
-                UserId =  ,
-                DateOrder =  
-            }
+                UserId = 1,
+                DateOrder = new System.DateTime()
+            });
 
+            var result3 = await repository.CreateAsync(purchaseMsg);
 
+            // Méthode 1 purchase
+            
 
 
 
