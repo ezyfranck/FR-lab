@@ -4,12 +4,11 @@ using ConsoleApp3;
 using PortaCapena.OdooJsonRpcClient.Consts;
 using System.Text.Json;
 using System.Diagnostics;
-using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using models;
-using ConsoleApp3.ezyapi.Product.models;
-using ConsoleApp3.ezyapi.Product.mapper;
+using PortaCapena.OdooJsonRpcClient.Converters;
+
 
 namespace models
 {
@@ -259,71 +258,143 @@ public class Program
         catch (Exception err)
         {
             throw new Exception("Failed Try <GetRecordsCurrency> \n" + err.Message.ToString());
-        }
-    }
-  */
+        }  
+     }
 
+ */
     // Main
     public static async Task Main()
     {
-
         try
-        {
-            //string? password = Environment.GetEnvironmentVariable("PORTA_PASSWORD");
-            /*
-            if (string.IsNullOrEmpty(password))
-            {
-                Console.WriteLine("Password not found in environment variables.");
-                return;
-            }
-            */
-          
+        {   
             // CONNEXION
-            /*
+
+ /*
+            string? password = Environment.GetEnvironmentVariable("PORTA_PASSWORD");
+          
+            
+            
             OdooConfig config = new OdooConfig(
                     apiUrl: "http://localhost:8069",
                     dbName: "test",
                     userName: "franck.rochette@ezytail.com",
                     password: password
                     );
-           */
+ */
            
             OdooConfig config = new OdooConfig(apiUrl: "http://10.102.9.101:8069/", dbName: "postgres", userName: "admin", password: "0doo_Master@dmin");
 
             var odooClient = new OdooClient(config!);
             var loginResult = await odooClient.LoginAsync();
 
+            // product
+            var repository = new OdooRepository<ProductProductOdooModel>(config!);
+
+  /*
+             
+            // Méthode 1 product
             var productMsg = new Article()
             {
-                ArticleReference = "test final",
+                ArticleReference = "Méthodo1 product final",
                 LongArticleDescription = "test description",
                 ArticlePrice1 = 1,
             };
-
-            var repository = new OdooRepository<ProductProductOdooModel>(config!);
-
-            var productsResult = await repository.Query().ToListAsync();
-
-            var model = ArticleMapper.ToDbModel(productMsg, null);
             
-            /*
-            var model2 = OdooDictionaryModel.Create(() => new ProductProductOdooModel() 
-            { 
-                Name = "product"
-            }); 
-            */
-            
-            var result = await repository.CreateAsync(model);
+            var modelProduct = ArticleMapper.ToDbModel(productMsg, null);                        
+            var result = await repository.CreateAsync(modelProduct);
 
-            /*
+            //var productsResult = await repository.Query().ToListAsync();
+
+ */
+
+ 
+            // Méthode 2 product
+            var productMsg = OdooDictionaryModel.Create(() => new ProductProductOdooModel() 
+            {
+                Name = "Méthodo2 product final",
+                Description = "joli produit",
+                LstPrice = 1,
+
+            });
+            var result = await repository.CreateAsync(productMsg);
+ 
+
+
+            // partner
+            
+            var repoPartner = new OdooRepository<ResPartnerOdooModel>(config!);
+            
+ /*
+             
+            // Méthode 1 partner
+            var partnerMsg = new Customer()
+            {
+                RecipientName = "Méthodo 1 client final",
+                RecipientAddress1 = "adress1 test",
+                RecipientAddress2 = null,
+                RecipientPostalCode = "12332",
+                RecipientCity = "testcity",
+                RecipientPhone = "0000000000",
+                RecipientPhone2 = "1111111111",
+            };
+            
+            var modelPartner = CustomerMapper.ToDbModel(partnerMsg, null);
+            var result2 = await repository.CreateAsync(modelPartner);
+
+            //partnerResult = await repoPartner.Query().ToListAsync();
+
+ */
+
+ 
+            // Méthode 2 partner
+            var partnerMsg2 = OdooDictionaryModel.Create(() => new ResPartnerOdooModel()
+            {
+                Name = "Méthodo2 client final",
+                Street = "test street",
+                Street2 = "test street",
+                Zip = "12345",
+                City = "Macity",
+                Phone = "0000000000",
+                Mobile = "1111111111" 
+            });
+
+            var result2 = await repository.CreateAsync(partnerMsg2);
+ 
+
+            // purchase
+
+            // Méthode 1 purchase
+            var purchaseOrder = OdooDictionaryModel.Create( ()=> new PurchaseOrderOdooModel()
+            {
+                Name = "Ptest",
+                ProductId = "" ,
+                UserId =  ,
+                DateOrder =  
+            }
+
+
+
+
+
+
+
+
+
+
+
+/*
             // get models
-            var tableName = "delivery.carrier";
+            var tableName = "purchase.order.line";
             var modelResult = await odooClient.GetModelAsync(tableName);
             var model = OdooModelMapper.GetDotNetModel(tableName, modelResult.Value);
             Console.WriteLine(model);
             }
-            */
 
+*/
+
+
+
+ /*
             var start = new Stopwatch();
             start.Start();
 
@@ -352,7 +423,7 @@ public class Program
 
                     foreach (var order in recordsSaleOrder)
                     {
-                        /*
+/*
                         // test paralelization
                         var tasks = new List<Task>();
 
@@ -381,8 +452,10 @@ public class Program
                             currency = recordsCurrency.FirstOrDefault();
                         }));
                         await Task.WhenAll(tasks);
-                        */
+*/
 
+
+ /*
                         nbOrder++;
                         
                         //  test linear
@@ -391,10 +464,13 @@ public class Program
 
                         var recordsOrderLine = await GetRecordsOrderLine(repositoryOrderLine, order.Id);
                         var products = new List<Product>();
-                        /*
+                        
+ /*
                         var recordsCurrency = await GetRecordsCurrency(repositoryCurrency, order.CurrencyId);
                         var currency = recordsCurrency.FirstOrDefault();
-                           */
+ */
+ 
+ /*   
                         foreach (var line in recordsOrderLine)
                         {
                             var recordsProductProduct = await GetRecordsProductProduct(repositoryProductProduct, line.ProductId);
@@ -430,6 +506,7 @@ public class Program
 
             }
             else Console.WriteLine("### Login failed !");
+ */
         }
             
         catch (Exception ex)

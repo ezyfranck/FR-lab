@@ -1,13 +1,6 @@
 ﻿using ConsoleApp3.ezyapi.Product.models;
-using models;
 using PortaCapena.OdooJsonRpcClient.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace ConsoleApp3.ezyapi.Product.mapper
 {

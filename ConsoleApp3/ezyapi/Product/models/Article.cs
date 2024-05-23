@@ -1,12 +1,6 @@
 ﻿using ConsoleApp3.ezyapi.Constants;
 using ConsoleApp3.ezyapi.Contracts;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-//using Swashbuckle.AspNetCore.Annotations;
 
 namespace ConsoleApp3.ezyapi.Product.models
 {
